@@ -1,0 +1,18 @@
+# Kbuild çıktıları
+*.o
+*.ko
+*.mod
+*.mod.c
+*.mod.o
+modules.order
+Module.symvers
+.*.cmd
+.tmp_versions/
+modules-only.symvers
+
+# Geliştirme ortamı (Tercihe bağlı olarak .vscode dizinini hariç tutabilirsiniz)
+.vscode/
+
+# Derlenmiş kullanıcı alanı test dosyaları
+user_space/reader
+user_space/writer
