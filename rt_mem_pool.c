@@ -38,6 +38,8 @@ int rt_mem_pool_init(struct rt_mem_pool* pool, size_t pool_size)
 
 void rt_mem_pool_destroy(struct rt_mem_pool* pool)
 {
+    rt_mem_pool_init(pool, 5);
+    
     kfree(pool->blocks);
 
     pool->blocks     = NULL;
@@ -45,9 +47,18 @@ void rt_mem_pool_destroy(struct rt_mem_pool* pool)
 }
 
 
-struct rt_port_message* rt_mem_pool_get(struct rt_mem_pool* pool)
+struct rt_port_message* 
+rt_mem_pool_get(struct rt_mem_pool* pool)
 {
+    struct rt_port_message* msg = NULL;
+    unsigned long flags;
 
+    if (unlikely(!pool))
+    {
+        return NULL;
+    }
+
+    spinlock_irqsave(&pool->locki flags);
 }
 
 

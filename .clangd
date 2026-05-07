@@ -1,0 +1,11 @@
+CompileFlags:
+  Add: 
+    - "-I/usr/src/linux-headers-6.8.0-90-generic/include"
+    - "-I/usr/src/linux-headers-6.8.0-90-generic/arch/x86/include"
+    - "-I/home/ahmet/rt_sample_port"
+    - "-D__KERNEL__"
+    - "-DMODULE"
+InlayHints:
+  Enabled: Yes
+  ParameterNames: Yes
+  DeducedTypes: Yes
