@@ -1,8 +1,8 @@
 #include <linux/types.h>
 #include <linux/slab.h>    /* kmalloc_array */
 #include <linux/vmalloc.h> /* vzalloc       */
-#include <rt_mem_pool.h>
-#include <common.h>
+#include "rt_mem_pool.h"
+#include "common.h"
 
 
 int rt_mem_pool_init(struct rt_mem_pool* pool, size_t pool_size)
@@ -37,9 +37,7 @@ int rt_mem_pool_init(struct rt_mem_pool* pool, size_t pool_size)
 
 
 void rt_mem_pool_destroy(struct rt_mem_pool* pool)
-{
-    rt_mem_pool_init(pool, 5);
-    
+{   
     kfree(pool->blocks);
 
     pool->blocks     = NULL;
@@ -47,8 +45,7 @@ void rt_mem_pool_destroy(struct rt_mem_pool* pool)
 }
 
 
-struct rt_port_message* 
-rt_mem_pool_get(struct rt_mem_pool* pool)
+struct rt_port_message* rt_mem_pool_get(struct rt_mem_pool* pool)
 {
     struct rt_port_message* msg = NULL;
     unsigned long flags;
@@ -58,11 +55,36 @@ rt_mem_pool_get(struct rt_mem_pool* pool)
         return NULL;
     }
 
-    spinlock_irqsave(&pool->locki flags);
+    spin_lock_irqsave(&pool->lock, flags); /* enter into critical section: disable isrs */
+
+    if (!list_empty(&pool->free_list))
+    {
+        msg = list_first_entry(&pool->free_list, struct rt_port_message, list);
+
+        list_del(&msg->list);
+        pool->free_count--;
+    }
+
+    spin_unlock_irqrestore(&pool->lock, flags);
+
+    return (msg);
 }
 
 
 void rt_mem_pool_put(struct rt_mem_pool* pool, struct rt_port_message* msg)
 {
+    unsigned long flags;
 
+    if (unlikely(WARN_ON_ONCE(!pool || !msg)))
+    {
+        return;
+    }
+
+    spin_lock_irqsave(&pool->lock, flags);
+
+    list_add(&msg->list, &pool->free_list);
+
+    pool->free_count++;
+
+    spin_unlock_irqrestore(&pool->lock, flags);
 }

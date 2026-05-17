@@ -8,18 +8,20 @@
 #define RT_POOL_SIZE 128
 
 
-struct rt_port_message {
-    struct list_head list;
-    struct rcu_head rcu;
-    ktime_t timestamp;
-    size_t length;
-    char payload[RT_MAX_MSG_SIZE];
+struct rt_port_message 
+{
+    struct list_head    list;
+    struct rcu_head     rcu;
+    ktime_t             timestamp;
+    size_t              length;
+    char                payload[RT_MAX_MSG_SIZE];
 };
 
-struct rt_mem_pool {
-    struct list_head free_list;
-    spinlock_t lock;
-    size_t free_count;
+struct rt_mem_pool 
+{
+    struct list_head        free_list;
+    spinlock_t              lock;
+    size_t                  free_count;
     struct rt_port_message* blocks;
 };
 
